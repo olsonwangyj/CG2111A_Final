@@ -7,7 +7,7 @@
 #include "constants.h"
 #define PI 3.141592654
 
-#define ALEX_LENGTH 25
+#define ALEX_LENGTH 25 //we need to fking callibrate this for the turning!!!!!!!!!!!!!!!!!!
 #define ALEX_BREADTH 16
 
 float alexDiagonal = 0.0;
@@ -20,7 +20,7 @@ volatile TDirection dir;
 // Number of ticks per revolution from the
 // wheel encoder.
 
-#define COUNTS_PER_REV 4
+#define COUNTS_PER_REV 4 //we need to fking callibrate this for the forward backward!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 // Wheel circumference in cm.
 // We will use this to calculate forward/backward distance traveled
@@ -28,15 +28,13 @@ volatile TDirection dir;
 
 #define WHEEL_CIRC 21
 
-/*
- *    Alex's State Variables
- */
 //for the colour sensor pin
 #define S0_PIN 6
 #define S1_PIN 7
 #define S2_PIN 5
 #define S3_PIN 3
 #define SENSOR_OUT_PIN 4
+
 // Store the ticks from Alex's left and
 // right encoders.
 volatile unsigned long leftForwardTicks;
@@ -44,31 +42,37 @@ volatile unsigned long rightForwardTicks;
 volatile unsigned long leftReverseTicks;
 volatile unsigned long rightReverseTicks;
 
+// Left and right encoder ticks for turning
 volatile unsigned long leftForwardTicksTurns;
 volatile unsigned long leftReverseTicksTurns;
 volatile unsigned long rightForwardTicksTurns;
 volatile unsigned long rightReverseTicksTurns;
+
 // Store the revolutions on Alex's left
 // and right wheels
-volatile unsigned long leftRevs;
-volatile unsigned long rightRevs;
+// volatile unsigned long leftRevs;
+// volatile unsigned long rightRevs;
 
 // Forward and backward distance traveled
 volatile unsigned long forwardDist;
 volatile unsigned long reverseDist;
+
+//variables to keep track of whether we have moved a commanded distance
 unsigned long deltaDist;
 unsigned long newDist;
 unsigned long deltaDistback;
 unsigned long newDistback;
-volatile unsigned long LeftforwardDist = 0;
-volatile unsigned long RightforwardDist = 0;
+
+//variables to keep track of our turning angle
 unsigned long deltaTicks;
 unsigned long targetTicks;
 
+//indicate the trig and echo pin of ultrasonic sensor
 const int trigPinLeft = A8;    // left ultrasonic sensor trig pin (White)
 const int echoPinLeft = A9;    // left ultrasonic sensor echo pin (Blue)
 const int trigPinRight = A10;  // right ultrasonic sensor trig pin (Yellow)
 const int echoPinRight = A11;  // right ultrasonic sensor echo pin (Green)
+
 //to store readings from left and right ultrasonic sensors
 int distanceLeft = 0;   // distance from left ultrasonic sensor
 int distanceRight = 0;  // distance from right ultrasonic sensor
@@ -80,23 +84,23 @@ unsigned long computeDeltaTicks(float ang) {
   return ticks;
 }
 
-void left(float ang, float speed) {
-  if (ang == 0)
-    deltaTicks = 99999999;
-  else
-    deltaTicks = computeDeltaTicks(ang);
-  targetTicks = leftReverseTicksTurns + deltaTicks;
-  ccw(ang, speed);
-}
+// void left(float ang, float speed) {
+//   if (ang == 0)
+//     deltaTicks = 99999999;
+//   else
+//     deltaTicks = computeDeltaTicks(ang);
+//   targetTicks = leftReverseTicksTurns + deltaTicks;
+//   ccw(ang, speed);
+// }
 
-void right(float ang, float speed) {
-  if (ang == 0)
-    deltaTicks = 99999999;
-  else
-    deltaTicks = computeDeltaTicks(ang);
-  targetTicks = leftForwardTicksTurns + deltaTicks;
-  cw(ang, speed);
-}
+// void right(float ang, float speed) {
+//   if (ang == 0)
+//     deltaTicks = 99999999;
+//   else
+//     deltaTicks = computeDeltaTicks(ang);
+//   targetTicks = leftForwardTicksTurns + deltaTicks;
+//   cw(ang, speed);
+// }
 
 TResult readPacket(TPacket *packet) {
   // Reads in data from the serial port and

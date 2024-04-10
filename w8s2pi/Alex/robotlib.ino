@@ -21,37 +21,7 @@ void move(float speed, int direction)
   motorBR.setSpeed(speed_scaled);
 
   switch(direction)
-    {/*
-      case BACK:
-        motorFL.run(BACKWARD);
-        motorFR.run(BACKWARD);
-        motorBL.run(FORWARD);
-        motorBR.run(FORWARD); 
-      break;
-      case GO:
-        motorFL.run(FORWARD);
-        motorFR.run(FORWARD);
-        motorBL.run(BACKWARD);
-        motorBR.run(BACKWARD); 
-      break;
-      case CW:
-        motorFL.run(BACKWARD);
-        motorFR.run(FORWARD);
-        motorBL.run(FORWARD);
-        motorBR.run(BACKWARD); 
-      break;
-      case CCW:
-        motorFL.run(FORWARD);
-        motorFR.run(BACKWARD);
-        motorBL.run(BACKWARD);
-        motorBR.run(FORWARD); 
-      break;
-      case STOP:
-      default:
-        motorFL.run(STOP);
-        motorFR.run(STOP);
-        motorBL.run(STOP);
-        motorBR.run(STOP); */
+    {
         case BACK:
         motorFL.run(FORWARD);
         motorFR.run(BACKWARD);
@@ -93,7 +63,7 @@ void forward(float dist, float speed)
     deltaDist=9999999;
     newDist=forwardDist + deltaDist;
   dir = (TDirection) FORWARD1;
-  move(speed, FORWARD);
+  move(speed, GO);
 }
 
 void backward(float dist, float speed)
@@ -104,7 +74,7 @@ void backward(float dist, float speed)
     deltaDist=9999999;
     newDistback=reverseDist+ deltaDist;
   dir = (TDirection) BACKWARD1;
-  move(speed, BACKWARD);
+  move(speed, BACK);
 }
 
 void ccw(float dist, float speed)

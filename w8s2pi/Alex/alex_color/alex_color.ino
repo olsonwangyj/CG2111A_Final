@@ -19,6 +19,9 @@ volatile TDirection dir;
 
 // Number of ticks per revolution from the
 // wheel encoder.
+unsigned long moveStartTime = 0; // Time when the move command was issued
+unsigned int moveDuration = 0; // Duration for the move in milliseconds
+bool isMoving = false; // Flag to check if movement is ongoing
 
 #define COUNTS_PER_REV 4 //we need to fking callibrate this for the forward backward!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -72,10 +75,13 @@ const int trigPinLeft = A8;    // left ultrasonic sensor trig pin (White)
 const int echoPinLeft = A9;    // left ultrasonic sensor echo pin (Blue)
 const int trigPinRight = A10;  // right ultrasonic sensor trig pin (Yellow)
 const int echoPinRight = A11;  // right ultrasonic sensor echo pin (Green)
+const int trigPinFront = A13;  // front ultrasonic sensor trig pin (Orange)
+const int echoPinFront = A14;  // front ultrasonic sensor echo pin (Brown)
 
 //to store readings from left and right ultrasonic sensors
 int distanceLeft = 0;   // distance from left ultrasonic sensor
 int distanceRight = 0;  // distance from right ultrasonic sensor
+int distanceFront = 0;  // distance from front ultrasonic sensor
 
 //new function to estimate number of wheel ticks
 // needed to turn an angle
@@ -174,7 +180,6 @@ void sendBadChecksum() {
 void sendBadCommand() {
   // Tell the Pi that we don't understand its
   // command sent to us.
-  dbprintf("bad");
 
   TPacket badCommand;
   badCommand.packetType = PACKET_TYPE_ERROR;
@@ -306,8 +311,8 @@ void startSerial() {
 
 int readSerial(char *buffer) {
   int count = 0;
-  while ((UCSR0A & 0b10000000))
-    buffer[count++] = UDR0;
+   while(Serial.available())
+    buffer[count++] = Serial.read();
 
   return count;
 }
@@ -469,9 +474,11 @@ void setupUltra() {
   pinMode(echoPinLeft, INPUT);
   pinMode(trigPinRight, OUTPUT);
   pinMode(echoPinRight, INPUT);
+  pinMode(trigPinFront, OUTPUT);
+  pinMode(echoPinFront, INPUT);
 }
 
-int findUltraLeft()  //find ultrasonic reading from both sensors
+int findUltraLeft()  //find ultrasonic reading from both sensors edited by yj 1242
 {
   // Send ultrasonic sensor pulse for left sensor
   digitalWrite(trigPinLeft, LOW);
@@ -509,6 +516,26 @@ int findUltraRight()  //find ultrasonic reading from right sensor
   return distanceRight;
 }
 
+int findDist()  //find ultrasonic reading from front sensor
+{
+  
+  // Send ultrasonic sensor pulse for right sensor
+  digitalWrite(trigPinFront, LOW);
+  delayMicroseconds(5);
+  digitalWrite(trigPinFront, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPinFront, LOW);
+
+  // Measure time for right ultrasonic sensor echo
+  long durationFront = pulseIn(echoPinFront, HIGH);
+
+  // Calculate distance from right ultrasonic sensor
+  distanceFront = durationFront / 58;
+
+ 
+  return distanceFront;
+}
+
 void sendUltra() {  //send ultrasonic packet
   TPacket ultraPacket;
   ultraPacket.packetType = PACKET_TYPE_RESPONSE;
@@ -517,6 +544,14 @@ void sendUltra() {  //send ultrasonic packet
   ultraPacket.params[1] = findUltraRight();
   sendResponse(&ultraPacket);
 }
+void sendDist() {  //send distance packet edited yj
+  TPacket distPacket;
+  distPacket.packetType = PACKET_TYPE_RESPONSE;
+  distPacket.command = RESP_DIST;
+  distPacket.params[0] = findDist();
+  sendResponse(&distPacket);
+}
+
 
 void handleCommand(TPacket *command) {
 
@@ -533,10 +568,10 @@ void handleCommand(TPacket *command) {
       break;
     // For movement commands, param[0] = distance, param[1] = speed.
     case COMMAND_FORWARD:
-    dbprintf("forward");
+ 
       sendOK();
-      
       forward((double)command->params[0], (float)command->params[1]);
+      sendDist();  //edited
       break;
     case COMMAND_REVERSE:
       sendOK();
@@ -633,6 +668,10 @@ void handlePacket(TPacket *packet) {
 }
 
 void loop() {
+ /*TXY commented out at 551pm,1442024
+  if (isMoving && (millis() - moveStartTime >= moveDuration)) {
+    stop(); // Stop the robot after the set duration
+  }*/
   // Uncomment the code below for Step 2 of Activity 3 in Week 8 Studio 2
 
   // forward(0, 100);
@@ -652,14 +691,15 @@ void loop() {
   } else if (result == PACKET_CHECKSUM_BAD) {
     sendBadChecksum();
   }
+/* TXY commented at 12:04am, 14/4/2024 
   if (deltaDist > 0) {
-    if (dir == FORWARD1) {
+    if (dir == FORWARD){
       if (forwardDist > newDist) {
         deltaDist = 0;
         newDist = 0;
         stop();
       }
-    } else if (dir == BACKWARD1){
+    } else if (dir == BACKWARD){
       if (reverseDist > newDistback) {
         deltaDist = 0;
         newDistback = 0;
@@ -689,5 +729,40 @@ void loop() {
       targetTicks = 0;
       stop();
     }
+  }*/
+  /*
+  current_time = millis();
+  if (dir == FORWARD1) 
+  {
+    move
+    
+    stop();
+    delay
+}
+*/
+/* if (deltaDist > 0) {
+if (dir == FORWARD1) {
+      delay(200);
+      stop();
+    } else if (dir == BACKWARD1) {
+      delay(200);
+      stop();
+    } else if (dir == STOP) {
+      stop();
+    }
+  }
+    if (deltaTicks > 0) {
+  if (dir == LEFT) {
+    delay(200);
+    stop();
+    } else if (dir == RIGHT) {
+      delay(200);
+      stop(); 
+    } else if (dir == STOP) {
+      stop();
+    }
+  }*/
+  if (isMoving && (millis() - moveStartTime >= moveDuration)) {
+    stop(); // Stop the robot after the set duration
   }
 }

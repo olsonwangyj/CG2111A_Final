@@ -12,7 +12,7 @@ AF_DCMotor motorFL(FRONT_LEFT);
 AF_DCMotor motorFR(FRONT_RIGHT);
 AF_DCMotor motorBL(BACK_LEFT);
 AF_DCMotor motorBR(BACK_RIGHT);
-/*
+
 void dbprintf(char *format, ...) {
   va_list args;
   char buffer[128];
@@ -20,7 +20,7 @@ void dbprintf(char *format, ...) {
   vsprintf(buffer, format, args);
   sendMessage(buffer);
 }
-*/
+
 void move(float speed, int direction) {
   int speed_scaled = (speed / 100.0) * 255;
   motorFL.setSpeed(speed_scaled);
@@ -63,24 +63,23 @@ void move(float speed, int direction) {
 }
 
 void forward(float dist, float speed) {
-/*  if (dist > 0)
+  if (dist > 0)
     deltaDist = dist;
   else{
     deltaDist = 9999999;
   }
-  newDist = forwardDist + deltaDist;*/
+  newDist = forwardDist + deltaDist;
   dir = (TDirection)FORWARD1;
- // move(speed, FORWARD);
- move(speed,FORWARD);
- }
+  move(speed, FORWARD);
+}
 
 void backward(float dist, float speed) {
-/*  if (dist > 0)
+  if (dist > 0)
     deltaDist = dist;
   else{
     deltaDist = 9999999;
   }
-  newDistback = reverseDist + deltaDist;*/
+  newDistback = reverseDist + deltaDist;
   dir = (TDirection)BACKWARD1;
   move(speed, BACKWARD);
 }

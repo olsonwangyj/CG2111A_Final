@@ -18,14 +18,14 @@ typedef enum
 } TPacketType;
 
 // Response types. This goes into the command field
-typedef enum
+typedef enum // RESP_Dist added yj
 {
   RESP_OK = 0,
   RESP_STATUS=1,
   RESP_BAD_PACKET = 2,
   RESP_BAD_CHECKSUM = 3,
   RESP_BAD_COMMAND = 4,
-  RESP_BAD_RESPONSE = 5, 
+  RESP_BAD_RESPONSE = 5,
   RESP_COLOR = 6,
   RESP_ULTRA = 7,
   RESP_DIST = 8
@@ -47,5 +47,23 @@ typedef enum
   COMMAND_COLOR = 7,
   COMMAND_ULTRA = 8
 } TCommandType;
-#endif
 
+typedef enum
+{
+ // STOP = 0,
+  FORWARD1=1,
+  BACKWARD1=2,
+  LEFT=3,
+  RIGHT=4
+} TDirection;
+
+// Direction values
+typedef enum dir
+{
+  STOP,
+  GO,
+  BACK,
+  CCW,
+  CW
+} Tdir;
+#endif

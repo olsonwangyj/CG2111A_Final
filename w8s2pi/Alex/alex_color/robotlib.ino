@@ -62,59 +62,41 @@ void move(float speed, int direction) {
   }
 }
 
-void forward(float dist, float speed) {
-/*  if (dist > 0)
-    deltaDist = dist;
-  else{
-    deltaDist = 9999999;
-  }
-  newDist = forwardDist + deltaDist;*/
+void forward(unsigned int duration, float speed) {
   dir = (TDirection)FORWARD1;
- // move(speed, FORWARD);
- move(speed,FORWARD);
- }
-
-void backward(float dist, float speed) {
-/*  if (dist > 0)
-    deltaDist = dist;
-  else{
-    deltaDist = 9999999;
-  }
-  newDistback = reverseDist + deltaDist;*/
-  dir = (TDirection)BACKWARD1;
-  move(speed, BACKWARD);
+  move(speed, GO);
+  moveStartTime = millis(); // Record start time
+  moveDuration = duration; // Set how long to move
+  isMoving = true; // Set moving flag
 }
 
-// void ccw(float dist, float speed) {
-//   dir = (TDirection)LEFT;
-//   move(speed, CCW);
-// }
-void left(float ang, float speed) {
-  if (ang == 0)
-    deltaTicks = 99999999;
-  else{
-    deltaTicks = computeDeltaTicks(ang);
-  }
-  targetTicks = leftReverseTicksTurns + deltaTicks;
+void backward(unsigned int duration, float speed) {
+  dir = (TDirection)BACKWARD1;
+  move(speed, BACK);
+  moveStartTime = millis(); // Record start time
+  moveDuration = duration; // Set how long to move
+  isMoving = true; // Set moving flag
+}
+
+
+void left(unsigned int duration, float speed) {
   dir = (TDirection)LEFT;
   move(speed, CCW);
+  moveStartTime = millis(); // Record start time
+  moveDuration = duration; // Set how long to move
+  isMoving = true; // Set moving flag
 }
-// void cw(float dist, float speed)
-// {
-//   dir = (TDirection) RIGHT;
-//   move(speed, CW);
-// }
-void right(float ang, float speed) {
-  if (ang == 0)
-    deltaTicks = 99999999;
-  else{
-    deltaTicks = computeDeltaTicks(ang);
-  }
-  targetTicks = leftForwardTicksTurns + deltaTicks;
+
+void right(unsigned int duration, float speed) {
   dir = (TDirection)RIGHT;
   move(speed, CW);
+  moveStartTime = millis(); // Record start time
+  moveDuration = duration; // Set how long to move
+  isMoving = true; // Set moving flag
 }
 
 void stop() {
   move(0, STOP);
+  isMoving=false;
 }
+

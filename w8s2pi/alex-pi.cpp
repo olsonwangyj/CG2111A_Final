@@ -14,6 +14,35 @@
 int exitFlag=0;
 sem_t _xmitSema;
 
+void handleUltra(TPacket *packet) { 
+uint32_t left_distance = packet->params[0];
+uint32_t right_distance = packet->params[1];
+printf("Left Distance:t\t%d cm\n", left_distance); 
+printf("Right Distance:t\t%d cm\n", right_distance); 	
+}
+
+void handleDist(TPacket *packet) { 
+uint32_t front_distance = packet->params[0];
+printf("Front Distance:\t%d cm\n", front_distance-4); 	
+}
+
+void handleColor(TPacket *packet)
+{
+	uint32_t result = packet->params[0];
+	if (result == 0)
+	{
+		printf("\nRed\n");
+	}
+	else if (result == 1)
+	{
+		printf("\nGreen\n");
+	}
+	else
+	{
+		printf("\nNo Color\n");
+	}
+}
+
 void handleError(TResult error)
 {
 	switch(error)
@@ -59,7 +88,16 @@ void handleResponse(TPacket *packet)
 		case RESP_STATUS:
 			handleStatus(packet);
 		break;
-
+        case RESP_COLOR:
+			handleColor(packet);
+		break;
+		
+		case RESP_ULTRA:
+			handleUltra(packet);
+		break;
+		case RESP_DIST:
+			handleDist(packet);
+		break;
 		default:
 			printf("Arduino is confused\n");
 	}
@@ -124,6 +162,7 @@ void sendPacket(TPacket *packet)
 	int len = serialize(buffer, packet, sizeof(TPacket));
 
 	serialWrite(buffer, len);
+	printf("sending data");
 }
 
 void *receiveThread(void *p)
@@ -163,7 +202,7 @@ void flushInput()
 
 	while((c = getchar()) != '\n' && c != EOF);
 }
-
+/*
 void getParams(TPacket *commandPacket)
 {
 	printf("Enter distance/angle in cm/degrees (e.g. 50) and power in %% (e.g. 75) separated by space.\n");
@@ -171,7 +210,7 @@ void getParams(TPacket *commandPacket)
 	scanf("%d %d", &commandPacket->params[0], &commandPacket->params[1]);
 	flushInput();
 }
-
+*/
 void sendCommand(char command)
 {
 	TPacket commandPacket;
@@ -180,36 +219,103 @@ void sendCommand(char command)
 
 	switch(command)
 	{
-		case 'f':
-		case 'F':
-			getParams(&commandPacket);
-			commandPacket.command = COMMAND_FORWARD;
-			sendPacket(&commandPacket);
-			break;
-
-		case 'b':
-		case 'B':
-			getParams(&commandPacket);
+		
+		case 's':
+		case 'S':
+			commandPacket.params[0] = 250;//changed from 750(20cm) to 250
+			commandPacket.params[1] = 100;
+			//getParams(&commandPacket);
 			commandPacket.command = COMMAND_REVERSE;
 			sendPacket(&commandPacket);
 			break;
-
-		case 'l':
-		case 'L':
-			getParams(&commandPacket);
+	//	case 'n':
+		case '1':
+			commandPacket.params[0] = 700;//changed from 750(20cm) to 250
+			commandPacket.params[1] = 100;
+			//getParams(&commandPacket);
+			commandPacket.command = COMMAND_REVERSE;
+			sendPacket(&commandPacket);
+			break;
+		case 'k':
+		case 'K':
+			commandPacket.params[0] = 2000;//changed from 750(20cm) to 250
+			commandPacket.params[1] = 100;
+			//getParams(&commandPacket);
+			commandPacket.command = COMMAND_REVERSE;
+			sendPacket(&commandPacket);
+			break;
+		case '9':
+			commandPacket.params[0] = 2000;//changed from 750(20cm) to 250
+			commandPacket.params[1] = 100;
+			//getParams(&commandPacket);
+			commandPacket.command = COMMAND_REVERSE;
+			sendPacket(&commandPacket);
+			break;
+		case 'a':
+		case 'A':
+			commandPacket.params[0] = 400;//changed from 500(5 D for 370 degree) to 300
+			commandPacket.params[1] = 100;
+			//TXY commented at 12:17am getParams(&commandPacket);
 			commandPacket.command = COMMAND_TURN_LEFT;
 			sendPacket(&commandPacket);
 			break;
-
-		case 'r':
-		case 'R':
-			getParams(&commandPacket);
+		case 'j':
+		case 'J':
+			commandPacket.params[0] = 500;//changed from 500(5 D for 370 degree) to 300
+			commandPacket.params[1] = 100;
+			//TXY commented at 12:17am getParams(&commandPacket);
+			commandPacket.command = COMMAND_TURN_LEFT;
+			sendPacket(&commandPacket);
+			break;
+		case 'd':
+		case 'D':
+			commandPacket.params[0] = 400;//changed from 500(5 D for 370 degree) to 300
+			commandPacket.params[1] = 100;
+			//TXY commented at 12:17am getParams(&commandPacket);
 			commandPacket.command = COMMAND_TURN_RIGHT;
 			sendPacket(&commandPacket);
 			break;
-
-		case 's':
-		case 'S':
+		case 'l':
+		case 'L':
+			commandPacket.params[0] = 500;//changed from 500(5 D for 370 degree) to 300
+			commandPacket.params[1] = 100;
+			//TXY commented at 12:17am getParams(&commandPacket);
+			commandPacket.command = COMMAND_TURN_RIGHT;
+			sendPacket(&commandPacket);
+			break;
+		case 'w':
+		case 'W':
+			commandPacket.params[0] = 250;//changed from 750(20cm) to 400
+			commandPacket.params[1] = 100;
+			//TXY commented at 12:17am getParams(&commandPacket);
+			commandPacket.command = COMMAND_FORWARD;
+			sendPacket(&commandPacket);
+			break;
+	//	case 'h':
+		case '2':
+			commandPacket.params[0] = 700;//changed from 750(20cm) to 400
+			commandPacket.params[1] = 100;
+			//TXY commented at 12:17am getParams(&commandPacket);
+			commandPacket.command = COMMAND_FORWARD;
+			sendPacket(&commandPacket);
+			break;
+		case 'i':
+		case 'I':
+			commandPacket.params[0] = 2000;//changed from 750(20cm) to 400
+			commandPacket.params[1] = 100;
+			//TXY commented at 12:17am getParams(&commandPacket);
+			commandPacket.command = COMMAND_FORWARD;
+			sendPacket(&commandPacket);
+			break;
+		case '0':
+			commandPacket.params[0] = 2000;//changed from 750(20cm) to 400
+			commandPacket.params[1] = 100;
+			//TXY commented at 12:17am getParams(&commandPacket);
+			commandPacket.command = COMMAND_FORWARD;
+			sendPacket(&commandPacket);
+			break;
+		case 'x':
+		case 'X':
 			commandPacket.command = COMMAND_STOP;
 			sendPacket(&commandPacket);
 			break;
@@ -232,6 +338,15 @@ void sendCommand(char command)
 			exitFlag=1;
 			break;
 
+		case 'p':
+			commandPacket.command = COMMAND_COLOR;
+			sendPacket(&commandPacket);
+			break;
+			
+		case 'u':
+			commandPacket.command = COMMAND_ULTRA;
+			sendPacket(&commandPacket);
+			
 		default:
 			printf("Bad command\n");
 
@@ -247,7 +362,6 @@ int main()
 	printf("WAITING TWO SECONDS FOR ARDUINO TO REBOOT\n");
 	sleep(2);
 	printf("DONE\n");
-
 	// Spawn receiver thread
 	pthread_t recv;
 
@@ -262,7 +376,7 @@ int main()
 	while(!exitFlag)
 	{
 		char ch;
-		printf("Command (f=forward, b=reverse, l=turn left, r=turn right, s=stop, c=clear stats, g=get stats q=exit)\n");
+		printf("Command (w= small forward, s= small reverse, a= small turn left, d= small turn right,i= big forward, k= big reverse, j= big turn left, l= big turn right, x=stop, c=clear stats, g=get stats q=exit)\n");
 		scanf("%c", &ch);
 
 		// Purge extraneous characters from input stream
@@ -274,3 +388,4 @@ int main()
 	printf("Closing connection to Arduino.\n");
 	endSerial();
 }
+
